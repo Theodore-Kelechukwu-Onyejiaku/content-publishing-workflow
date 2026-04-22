@@ -1,0 +1,855 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        144
+      ],
+      "id": "c7a72e9f-e33a-46dc-b498-a0f4e6b39ef9",
+      "name": "Webhook",
+      "webhookId": "312b0556-cce5-4b39-b442-2e878860c3b2",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fad224f0-28d7-4bac-ac3e-62be49286786",
+              "name": "Editor 1",
+              "value": "theodore.onyejiaku@strapi.io",
+              "type": "string"
+            },
+            {
+              "id": "670e13df-fd25-4bf0-9ae3-e8afc7b4fc6e",
+              "name": "Editor 2",
+              "value": "carrie@growthx.ai",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        240
+      ],
+      "id": "73acacf4-f252-40e6-8be3-f25ab8a38d7b",
+      "name": "Set Email Addresses"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"Editor 1\"] }},{{ $json[\"Editor 2\"] }}",
+        "subject": "=Failed to Update in Airtable",
+        "message": "=<div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.5; color: #111827;\">\n  <h2 style=\"margin: 0 0 12px; font-size: 18px; font-weight: 700;\">\n    Airtable Update Failed\n  </h2>\n\n  <p style=\"margin: 0 0 12px;\">\n    The assignment status for the post titled\n    <strong>{{ $('Webhook').item.json.body.entry.title }}</strong>\n    could not be updated in Airtable.\n  </p>\n\n  <div style=\"margin: 16px 0; padding: 12px 14px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px;\">\n    <p style=\"margin: 0; font-weight: 600;\">What happened?</p>\n    <p style=\"margin: 6px 0 0;\">\n      The record could not be fetched from Airtable because no matching title was found.\n    </p>\n  </div>\n\n  <div style=\"margin: 16px 0; padding: 12px 14px; background: #EFF6FF; border: 1px solid #60A5FA; border-radius: 8px;\">\n    <p style=\"margin: 0; font-weight: 600;\">How to fix it</p>\n    <p style=\"margin: 6px 0 0;\">\n      Make sure the <strong>Entry Title</strong> in Strapi exactly matches the title in Airtable (including spelling, spacing, and punctuation).\n    </p>\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        400
+      ],
+      "id": "b8b60470-c072-4489-8811-235ec00acf02",
+      "name": "Send an Email",
+      "webhookId": "5ce1f9cc-be30-48c0-a038-a1adc11bd1f7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lxHkEaDSfhVZ6VCl",
+          "name": "Google Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5feba5e-a203-4e5f-9b9c-432bfe49f1c5",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        16
+      ],
+      "id": "88a15d19-f7b5-41f6-b13b-dba465da431a",
+      "name": "If Record Found"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "={{ $json.AIRTABLE_BASE_ID }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $json.TABLE_ID }}",
+          "mode": "id"
+        },
+        "filterByFormula": "={{ '{' + String($json.FIELD_NAME).replace(/[{}]/g, '').trim() + '}' }} = \"{{ $json.SEARCH_TITLE.trim() }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        16
+      ],
+      "id": "d7f549f7-1882-466a-948d-b01b8e10a26c",
+      "name": "Search records",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ZBpytoKLtYPUqOw9",
+          "name": "PAT Token for Tutorial"
+        }
+      },
+      "notes": "Strapi entry record could not be found!"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3eb622f4-182e-40b5-b535-690981edc756",
+              "name": "AIRTABLE_BASE_ID",
+              "value": "appL8ls4nPv8fPTfa",
+              "type": "string"
+            },
+            {
+              "id": "42a15a2f-947a-45da-ad97-c788dc6bc28e",
+              "name": "FIELD_NAME",
+              "value": "Assignment Name",
+              "type": "string"
+            },
+            {
+              "id": "e9f75d4a-9714-4cd8-8c8a-cf69c2a8dc98",
+              "name": "SEARCH_TITLE",
+              "value": "={{ $json.body.entry.title.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "dd57640f-9f5f-49f5-a3dc-d2a2b7897c46",
+              "name": "TABLE_ID",
+              "value": "tblNvWSedeIUoUZ88",
+              "type": "string"
+            },
+            {
+              "id": "9c9505de-42ee-4565-9001-39bce51541bb",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        16
+      ],
+      "id": "8e3f5c9a-e006-4468-aeaf-8c77ebe10690",
+      "name": "Set Search Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f627e047-52f0-459e-9b55-c979fc06fb49",
+              "name": "URL",
+              "value": "={{ $json.entryURL }}",
+              "type": "string"
+            },
+            {
+              "id": "40782702-74f1-4960-8811-9697c0ba6ec5",
+              "name": "ASSIGNMENT STATUS",
+              "value": "Published",
+              "type": "string"
+            },
+            {
+              "id": "b0498f7d-2f09-451e-9f72-a3e3cb249654",
+              "name": "PUBLISH_DATE",
+              "value": "={{ $('Webhook').item.json.body.entry.publishedAt? $('Webhook').item.json.body.entry.publishedAt.split('T')[0]\n    : \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "5eaa7e28-9102-43e0-bde5-9a0dd6d15bca",
+              "name": "AIRTABLE_URL",
+              "value": "=https://api.airtable.com/v0",
+              "type": "string"
+            },
+            {
+              "id": "996a7bfa-70cd-44e8-85f0-34cf6a22d8f7",
+              "name": "AIRTABLE_BASE_ID",
+              "value": "={{ $('Set Search Fields').item.json.AIRTABLE_BASE_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "f3b074cc-d11d-490d-a003-f36705f314ce",
+              "name": "RECORD_ID",
+              "value": "={{ $('Search records').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "433ffc5b-4bf3-48a3-80f4-2e2f7a331ede",
+              "name": "AIRTABLE_TABLE_NAME",
+              "value": "Assignments",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "59419032-a195-47bb-9c0e-7685ddded5cf",
+      "name": "Set Airtable Update Records"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "=channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ATXKMSLKS",
+          "mode": "list",
+          "cachedResultName": "all-theo-and-agencies"
+        },
+        "user": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "text": "=:loudspeaker: *A new {{ $('Webhook').item.json.body.model }} entry has been published*\n\n*Title:* {{ $('Webhook').item.json.body.entry.title }}\n\n*Entry URL:* {{ $('Generate Entry URL').item.json.entryURL }}\n",
+        "otherOptions": {
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "78065515-1d9a-473c-a4cb-ca2e3b3c0285",
+      "name": "Send Slack Notification",
+      "webhookId": "30a7e5d4-e948-4401-ba3c-d016302e0345",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "VP6wu7YRLJZNTC9V",
+          "name": "Tutorial Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bf28b5e0-ba2b-4c29-a8b7-cc8cabb3d54b",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "=entry.publish",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        144
+      ],
+      "id": "48585e75-8554-436f-901e-3f1ef28a1220",
+      "name": "If Publish Event"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4c037dca-fef5-4567-a912-b69eb7ffe47c",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        480,
+        0
+      ],
+      "id": "926d7446-57bf-4f75-a2ee-810c5ab6beb0",
+      "name": "If Update Successful"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $json.AIRTABLE_URL }}/{{ $json.AIRTABLE_BASE_ID }}/{{ $json.AIRTABLE_TABLE_NAME }}/{{ $json.RECORD_ID }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"fields\": {\n    \"Publish Date\": \"{{ $json.PUBLISH_DATE }}\",\n    \"URL\": \"{{ $json.URL }}\",\n    \"Assignment Status\": \"{{ $json['ASSIGNMENT STATUS'] }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        0
+      ],
+      "id": "8754e191-85bc-4160-a187-60c4b217e306",
+      "name": "Update Airtable",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7cIQHVjaCBy5iXGa",
+          "name": "Airtable PAT for Tutorial"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        336
+      ],
+      "id": "a1804e67-c226-490e-b5bb-f3071b250b0a",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-haiku-4-5-20251001",
+          "mode": "list",
+          "cachedResultName": "claude-haiku-4-5-20251001"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a LinkedIn post promoting my blog post. Match this style exactly:\n\n1. Start with the blog post title on its own line (no intro, no \"Hey everyone\")\n2. Write 2–4 lines that highlight what the reader will learn or gain, using relevant emojis as bullet markers (🚀 ✅ ⚠️ 💡 etc.)\n3. End with a short call-to-action line starting with 👉 followed by the link\n4. Keep it concise, punchy, and value-focused — no fluff, no hashtags\n5. Keep it within 50 -100 words\n6. Do not use `\\n` or any escape sequences. Use actual line breaks in your response.\n\nHere are examples: \n1. Let's Build A Strapi Plugin To Integrate Vercel AI SDK In Our Next.js 16 Project\n\nHere’s what you will learn:\n\n🚀 Build a Strapi plugin to centralize AI logic\n⚠️ Use Vercel AI SDK for consistent streaming + responses\n✅ Expose AI actions directly inside your CMS workflows\n\n👉 Full Tutorial: https://strapi.io/blog/let-s-build-a-strapi-plugin-to-integrate-vercel-s-ai-sdk-in-our-next-js-16-project\n\n2. Agent Skills turn repeated prompts into reusable workflows. 🚀\n\nThis guide breaks down what skills are, how they use progressive disclosure to protect context, and how to build portable skills that work across Claude, Codex, Gemini CLI, GitHub Copilot, Cursor, and more.\n\n👉 Complete guide: https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them\n\n3. Automate Your Content Publishing with Strapi and n8n\n\nLearn how to automate your workflow: trigger on publish, update Airtable, create the live URL, notify Slack, and email editors when records are missing.\n\nLess manual work, fewer missed updates.\n\n👉 Full tutorial: https://strapi.io/blog/how-to-automate-your-content-workflow-with-strapi-and-n8n\n\nBlog post title: {{ $('Webhook').item.json.body.entry.title }}\nBlog post link: {{ $('Generate Entry URL').item.json.entryURL }}\nBlog post content: {{ $('Webhook').item.json.body.entry.content }}"
+            }
+          ]
+        },
+        "options": {
+          "system": "You are an experienced social media manager"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -32
+      ],
+      "id": "305801b5-7dac-478c-9655-adfbc4981e45",
+      "name": "Message a model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "hpiQT03H5CdIlFHq",
+          "name": "Theodore's API Key"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        544,
+        336
+      ],
+      "id": "de341feb-3bbe-4959-80de-c8ecdd06a678",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7c83ae83-9cb7-4252-abd1-4cf2cad0481d",
+              "leftValue": "={{ $('Webhook').item.json.body.model }}",
+              "rightValue": "=blog-post",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "4a8acc88-26fb-4461-b223-2a62d783fb28",
+      "name": "If Blog Post"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "efc61534-743c-49bb-b164-5721eb22a10e",
+              "name": "Message",
+              "value": "={{ $('Message a model').item.json.content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "d54c0e15-c46b-4a10-a7c0-9a4cf47e7665",
+              "name": "Account",
+              "value": "Linkedin",
+              "type": "string"
+            },
+            {
+              "id": "f3702605-2ce9-44f3-aac8-0c652bf44432",
+              "name": "Link",
+              "value": "={{ $('Generate Entry URL').item.json.entryURL }}",
+              "type": "string"
+            },
+            {
+              "id": "eec8d05e-4337-40f3-81f3-7860b9e8a3c3",
+              "name": "Date",
+              "value": "={{ $json.newDate.split(\"T\")[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1728,
+        -32
+      ],
+      "id": "1aab95df-6659-4a45-9c57-70a2b99f7912",
+      "name": "Social Media Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1vP93H8pIoyEvGANuYtLzA19u0m3c9aWwd0sEtxtEbd0",
+          "mode": "list",
+          "cachedResultName": "Social Media",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vP93H8pIoyEvGANuYtLzA19u0m3c9aWwd0sEtxtEbd0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vP93H8pIoyEvGANuYtLzA19u0m3c9aWwd0sEtxtEbd0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "MESSAGE": "={{ $json.Message }}",
+            "ACCOUNT": "={{ $json.Account }}",
+            "LINK": "={{ $json.Link }}",
+            "DATE": "={{ $json.Date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ACCOUNT",
+              "displayName": "ACCOUNT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MESSAGE",
+              "displayName": "MESSAGE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LINK",
+              "displayName": "LINK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CAMPAIGN",
+              "displayName": "CAMPAIGN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Character count (accounting for shortened link)",
+              "displayName": "Character count (accounting for shortened link)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        -32
+      ],
+      "id": "fe87b8f0-3dff-42f5-9d10-61a911f3ce1a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Uzn6NEZMVfiVZlJ0",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addToDate",
+        "magnitude": "={{ $('Update Airtable').item.json.fields[\"Publish Date\"] }}",
+        "timeUnit": "=days",
+        "duration": 7,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -32
+      ],
+      "id": "42a1257a-668d-4aee-be24-beed2415308a",
+      "name": "(Date and Time) Add More Days"
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhook = $('Webhook').first().json.body;\n\nconst modelToPath = {\n  comparator: 'comparison',\n  integration: 'integrations',\n  'blog-post': 'blog',\n};\n\nconst base = 'https://positive-cabbage-582eafb055.strapiapp.com/';\nconst slug = webhook?.entry?.slug;\nconst path = modelToPath[webhook?.model];\n\nif (!path || !slug) {\n  // leave a breadcrumb for downstream nodes\n  return [];\n}\n\nreturn [{ entryURL: `${base}/${path}/${slug}` }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "602c0f56-c872-48fe-8aaf-ef44c7e3e23b",
+      "name": "Generate Entry URL"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        992,
+        160
+      ],
+      "id": "fb92f148-e691-4299-a953-fa36e549520d",
+      "name": "No Operation, do nothing2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If Publish Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email Addresses": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Record Found": {
+      "main": [
+        [
+          {
+            "node": "Generate Entry URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Email Addresses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If Record Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Search Fields": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Airtable Update Records": {
+      "main": [
+        [
+          {
+            "node": "Update Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "If Blog Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Publish Event": {
+      "main": [
+        [
+          {
+            "node": "Set Search Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Update Successful": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Airtable": {
+      "main": [
+        [
+          {
+            "node": "If Update Successful",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "(Date and Time) Add More Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Blog Post": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Social Media Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(Date and Time) Add More Days": {
+      "main": [
+        [
+          {
+            "node": "Social Media Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Entry URL": {
+      "main": [
+        [
+          {
+            "node": "Set Airtable Update Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "941cd88824e199abc0337737f73f4308366453cdbbeb2bb0996492be29a44ab4"
+  }
+}
